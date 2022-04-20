@@ -1,0 +1,17 @@
+Research Topic
+Meghana Gantla, Hang Wang, Adarsh Kotla
+
+The research topic we chose for our group is to study song data from Spotify. 
+We have around 18000 observations and 15 variables in the dataset including the popularity, duration, energy, and danceability of each song. 
+
+SMART Question: 
+What factors affect the popularity of a song?
+We will pre-process the data for duplicates and then split it into two parts for training and testing. 
+We want to perform Principal Component Analysis (PCA) as most of the variables are continuous. 
+The complexity here arises from strong multicollinearity between variables. After the analysis, 
+we will use our findings to predict the popularity of a song based on its energy, loudness, acoustics, liveness, etc. 
+
+Links: 
+The dataset is from Kaggle: https://www.kaggle.com/datasets/edalrami/19000-spotify-songs
+Github repository link: https://github.com/MeghanaGantla/DS-6103-Project
+
