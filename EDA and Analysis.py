@@ -10,15 +10,31 @@ import seaborn as sns
 import math
 
 #%%
-tracks = pd.read_csv("song_data.csv")
-print(tracks.head())
+# Reading data
+df = pd.read_csv("song_data.csv")
+df.head()
+
+#%% 
+# Checking datatypes 
+df.info() 
+
+#%%
+# Describing data
+df.describe()
+
 # %%
-len(tracks)
+# unique values in each column
+df.nunique().sort_values()
+
 # %%
-len(tracks["song_popularity"].unique())
-# %%
-matrix = tracks.corr()
-print(matrix)
-print("Correlation plot for artists:")
-sns.heatmap(tracks.corr(), annot = True)
-plt.show()
+# checking for NA values
+df.isnull().sum()
+
+#%%
+# Checking for duplicates
+dups = df.duplicated(subset = None, keep = 'first')
+duplicates = dups[dups == True].shape[0]
+print("Number of observations in the data frame: ", len(df))
+print("Number of duplicates: ", str(duplicates))
+df.drop_duplicates(inplace=True)
+print("Number of observations in the dataframe after dropping duplicates: ", len(df))
