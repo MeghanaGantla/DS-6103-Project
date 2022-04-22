@@ -58,3 +58,18 @@ plt.show()
 sns.pairplot(df)
 plt.show()
 # %%
+sns.histplot(df["song_duration_ms"], color="green")
+plt.show()
+sns.histplot(df["acousticness"], color = "blue")
+plt.show()
+plt.subplot()
+sns.boxplot(x = "song_duration_ms", color = "green", data=df)
+plt.show()
+# %%
+fig, axis = plt.subplots(7, 2)
+fig.set_size_inches(25, 25)
+column = df.columns
+for i in range(7):
+    for j in range(2):
+        sns.distplot(df[column[2*i+j]], ax=axis[i, j])
+# %%
