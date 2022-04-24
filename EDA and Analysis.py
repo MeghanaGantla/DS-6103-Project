@@ -28,7 +28,8 @@ df.describe().transpose()
 
 # %%
 # Removing irrelevant columns
-df.drop(['song_name'], axis=1, inplace=True)
+df.drop(['song_name'], axis = 1, inplace = True)
+df.drop(["instrumentalness"], axis = 1, inplace = True)
 df.head()
 
 
@@ -64,14 +65,33 @@ plt.show()
 sns.pairplot(df)
 plt.show()
 
-# %%
+# %% 
+# Seperating Numerical data
+nf = df.drop(["key", "mode", "tsign"], axis = 1)
+nf.head()
+
+#%% 
+# Seperating Categorical data
+cf = df[["key", "mode", "tsign"]]
+cf.head()
 
 # %%
-fig, axis = plt.subplots(7, 2)
+# Histograms for Numerical data
+fig, axis = plt.subplots(5, 2)
 fig.set_size_inches(25, 25)
-column = df.columns
-for i in range(7):
+column = nf.columns
+for i in range(5):
     for j in range(2):
-        sns.histplot(df[column[2*i+j]], ax=axis[i, j])
+        sns.histplot(nf[column[2*i+j]], ax=axis[i, j], color = list(np.random.randint([255,255,255])/255))
+
+#%%
+# Count plots for categorical data
+sns.countplot(x = "mode", data = df, palette="Set2")
+plt.show()
+sns.countplot(x = "key", data = df, palette="Set2")
+plt.show()
+sns.countplot(x = "tsign", data = df, palette="Set2")
+plt.xlabel("Time Signature")
+plt.show()
 
 # %%
