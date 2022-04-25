@@ -95,3 +95,70 @@ plt.xlabel("Time Signature")
 plt.show()
 
 # %%
+# %%
+# Do regresion analysis 
+# FORMULA based
+from statsmodels.formula.api import ols
+from sklearn.tree import DecisionTreeClassifier
+# Import train_test_split
+from sklearn.model_selection import train_test_split
+# Import accuracy_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix 
+from sklearn.metrics import classification_report
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsClassifier
+#%%
+model = ols(formula='popularity ~key + mode + tsign+duration + acousticness + danceability + energy + liveness + loudness + speechiness + tempo + valence', data=df)
+print( type(model) ) 
+
+modelFit = model.fit()
+print( modelFit.summary() )
+#%%
+#Drop variables which P-value <0.05
+model2 = ols(formula='popularity ~mode + tsign + acousticness + danceability + energy + liveness + loudness + speechiness + tempo + valence', data=df)
+print( type(model2) ) 
+model2Fit = model2.fit()
+print( model2Fit.summary() )
+#%%
+#Build linear regression model
+df["popularity"].where(df["popularity"] < 99, 99, True)
+df['popularity'].value_counts()
+
+x_popularity = df[['key', 'mode', 'tsign', 'duration', 'acousticness', 'danceability', 'energy', 'liveness', 'loudness', 'speechiness', 'tempo', 'valence']]
+y_popularity = df['popularity']
+X_train, X_test, y_train, y_test= train_test_split(x_popularity, y_popularity, test_size=0.2, stratify=y_popularity,random_state=1)
+model = LinearRegression(normalize=True)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print(np.sum(abs(y_pred - y_test)) / len(y_pred))
+print(model.score(X_test, y_test))
+
+
+#%%Then bulid tree decision model
+
+# %%
+#Error: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+#So need change the part of dataframe
+#df['popularity'].value_counts()
+x_popularity = df[['key', 'mode', 'tsign', 'duration', 'acousticness', 'danceability', 'energy', 'liveness', 'loudness', 'speechiness', 'tempo', 'valence']]
+y_popularity = df['popularity']
+df["popularity"].where(df["popularity"] < 99, 99, True)
+df['popularity'].value_counts()
+X_train, X_test, y_train, y_test= train_test_split(x_popularity, y_popularity, test_size=0.2, stratify=y_popularity,random_state=1)
+#%%
+dtree_popularity1 = DecisionTreeClassifier( random_state=1)
+dtree_popularity1.fit(X_train,y_train)
+y_test_pred = dtree_popularity1.predict(X_test)
+#%%
+print(accuracy_score(y_test, y_test_pred))
+# print(confusion_matrix(y_test, y_test_pred))
+# print(classification_report(y_test, y_test_pred))
+# %%
+#Then try knn model 
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors = 10)
+knn.fit
+y_pred = knn.predict(x_popularity )                                                                                                 
+knn.score(x_popularity,y_popularity)
+# Can't not fit, the reason may be the y have too much values and not dummy(catelogy) variable
