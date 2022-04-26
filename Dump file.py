@@ -176,3 +176,67 @@ model_acc = model.score(X_test, y_test)
 
 print("Test Accuracy (No Outliers): {:.5f}%".format(model_acc * 100))
 # %%
+# __________________________________________ 03:02am 05/26
+#%%
+from sklearn.preprocessing import OneHotEncoder
+pd.get_dummies(df["key"])
+#onehot = OneHotEncoder(categorical_features = [])
+
+
+#%%
+#Converting categorical Columns to Numeric
+nvc = pd.DataFrame(df.isnull().sum().sort_values(), columns=['Total Null Values'])
+nvc['Percentage'] = round(nvc['Total Null Values']/df.shape[0],3)*100
+print(nvc)
+
+df3 = df.copy()
+
+ecc = nvc[nvc['Percentage']!=0].index.values
+fcc = [i for i in cf if i not in ecc]
+#One-Hot Binay Encoding
+oh=True
+dm=True
+for i in fcc:
+    #print(i)
+    if df3[i].nunique()==2:
+        if oh==True: print("\033[1mOne-Hot Encoding on features:\033[0m")
+        print(i);oh=False
+        df3[i]=pd.get_dummies(df3[i], drop_first=True, prefix=str(i))
+    if (df3[i].nunique()>2 and df3[i].nunique()<17):
+        if dm==True: print("\n\033[1mDummy Encoding on features:\033[0m")
+        print(i);dm=False
+        df3 = pd.concat([df3.drop([i], axis=1), pd.DataFrame(pd.get_dummies(df3[i], drop_first=True, prefix=str(i)))],axis=1)
+        
+df3.shape
+# %%
+df1 = df3.copy()
+
+#features1 = [i for i in features if i not in ['CHAS','RAD']]
+features1 = nf
+
+for i in features1:
+    Q1 = df1[i].quantile(0.25)
+    Q3 = df1[i].quantile(0.75)
+    IQR = Q3 - Q1
+    df1 = df1[df1[i] <= (Q3+(1.5*IQR))]
+    df1 = df1[df1[i] >= (Q1-(1.5*IQR))]
+    df1 = df1.reset_index(drop=True)
+display(df1.head())
+print('\n\033[1mInference:\033[0m\nBefore removal of outliers, The dataset had {} samples.'.format(df3.shape[0]))
+print('After removal of outliers, The dataset now has {} samples.'.format(df1.shape[0]))
+# %%
+df1.drop('song_popularity', axis=1)
+y = df1['popularity'].copy()
+X = df1.drop('popularity', axis=1).copy()
+    
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random_state=1)
+    
+# %%
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+model_acc = model.score(X_test, y_test)
+
+print("Test Accuracy (No Outliers): {:.5f}%".format(model_acc * 100))
+# %%
