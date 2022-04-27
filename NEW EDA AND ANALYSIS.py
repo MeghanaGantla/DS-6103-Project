@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import statsmodels.api as sm
+import pylab as py
 import math
 from scipy import stats
 from sklearn.neural_network import MLPClassifier
@@ -47,6 +49,24 @@ df.info()
 # Describing data
 df.describe().transpose()
 
+#%%
+plt.figure(figsize=(25,25))
+sns.histplot(df["song_popularity"], color="green")
+plt.xlabel("Popularity")
+plt.savefig("Popularityhist.jpg")
+plt.show()
+#%%
+plt.figure(figsize=(25,25))
+sns.boxplot(df["song_popularity"], color = "yellow")
+plt.xlabel("Popularity")
+#plt.savefig("Popularitybox.jpg")
+plt.show()
+
+#%%
+plt.figure(figsize=(25,12))
+sns.countplot(df["popularity"], palette="Set2")
+#plt.savefig("Popularitycount.jpg")
+plt.show()
 # %%
 # Removing irrelevant columns
 df.drop(["song_popularity"], axis = 1, inplace=True)
@@ -97,6 +117,8 @@ print("Numerical data: \n", nf.head())
 # Seperating categorical data
 cf = df[["key", "mode", "tsign", 'popularity']]
 print("\nCategorical data: \n", cf.head())
+
+nf.describe().transpose()
 
 #%%
 # Plots with outliers
@@ -241,6 +263,14 @@ model2 = ols(formula='popularity ~ mode + tsign + acousticness + danceability + 
 print(type(model2) ) 
 model2Fit = model2.fit()
 print(model2Fit.summary())
+
+#%%
+# Multinomial logit
+from statsmodels.formula.api import mnlogit
+model3 = mnlogit(formula = "popularity ~ C(mode)+C(tsign)+C(key)+ acousticness + danceability + energy + liveness + loudness + speechiness + tempo + valence", data = df1)
+model3logitfit = model3.fit()
+print(model3logitfit.summary())
+# Pseudo R-Squared value - 0.0405
 
 #%%
 #Build linear regression model
