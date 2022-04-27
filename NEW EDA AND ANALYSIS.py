@@ -182,6 +182,16 @@ df1.head()
 
 # %% 
 # After removing outliers
+# heatmap
+plt.figure(figsize=(25,15))
+sns.heatmap(df1.corr(), vmin=-1, vmax=1, center=0, annot = True)
+plt.title("Correlations between columns")
+plt.show()
+
+# Pairplot
+plt.figure(figsize=(25,15))
+sns.pairplot(df1)
+plt.show()
 
 # Seperating Numerical data
 nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
