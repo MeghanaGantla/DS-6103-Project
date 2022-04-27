@@ -111,7 +111,6 @@ dupdf["popularity"] = encoder.fit_transform(dupdf["popularity"])
 dupdf.head()
 
 # %% Removing outliers
-
 df1 = df.copy()
 features1 = nf
 
@@ -125,6 +124,7 @@ for i in features1:
 print('\n\033[1mInference:\033[0m\nBefore removal of outliers, The dataset had {} samples.'.format(dupdf.shape[0]))
 print('After removal of outliers, The dataset now has {} samples.'.format(df1.shape[0]))
 df1.head()
+
 # %%
 # Splitting data
 y = df1['popularity']
@@ -182,19 +182,20 @@ print("Accuracy: {:.5f}%".format(accu * 100))
 #X_train, X_test, y_train, y_test= train_test_split(x_popularity, y_popularity, test_size=0.2, stratify=y_popularity,random_state=1)
 #%%
 # Decision tree
-dtree_popularity1 = DecisionTreeClassifier( random_state=1)
+dtree_popularity1 = DecisionTreeClassifier(random_state=1)
 dtree_popularity1.fit(X_train,y_train)
 y_test_pred = dtree_popularity1.predict(X_test)
-print(accuracy_score(y_test, y_test_pred))
-print(confusion_matrix(y_test, y_test_pred))
-print(classification_report(y_test, y_test_pred))
+print("Accuracy: {:.5f}%".format(accuracy_score(y_test, y_test_pred)*100))
+#print(accuracy_score(y_test, y_test_pred))
+print("Confusion matrix: \n", confusion_matrix(y_test, y_test_pred))
+print("Classification report: \n", classification_report(y_test, y_test_pred))
 
 # %%
 # KNN model 
 from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors = 10)
 knn.fit(X_train, y_train)
-y_pred = knn.predict(x_popularity )                                                                                                 
-knn.score(x_popularity, y_popularity)
+y_pred = knn.predict(x_popularity)                                                                                                 
+print("Accuracy: {:.5f}%".format(knn.score(x_popularity, y_popularity)*100))
 
 # %%
