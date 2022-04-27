@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 from scipy import stats
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from statsmodels.formula.api import ols
 from sklearn.tree import DecisionTreeClassifier
@@ -121,7 +122,7 @@ for i in features1:
     df1 = df1[df1[i] <= (Q3+(1.5*IQR))]
     df1 = df1[df1[i] >= (Q1-(1.5*IQR))]
     df1 = df1.reset_index(drop=True)
-print('\n\033[1mInference:\033[0m\nBefore removal of outliers, The dataset had {} samples.'.format(dupdf.shape[0]))
+print('Before removal of outliers, The dataset had {} samples.'.format(df.shape[0]))
 print('After removal of outliers, The dataset now has {} samples.'.format(df1.shape[0]))
 df1.head()
 
@@ -180,6 +181,7 @@ print("Accuracy: {:.5f}%".format(accu * 100))
 #df["popularity"].where(df["popularity"] < 99, 99, True)
 #df['popularity'].value_counts()
 #X_train, X_test, y_train, y_test= train_test_split(x_popularity, y_popularity, test_size=0.2, stratify=y_popularity,random_state=1)
+
 #%%
 # Decision tree
 dtree_popularity1 = DecisionTreeClassifier(random_state=1)
@@ -188,7 +190,7 @@ y_test_pred = dtree_popularity1.predict(X_test)
 print("Accuracy: {:.5f}%".format(accuracy_score(y_test, y_test_pred)*100))
 #print(accuracy_score(y_test, y_test_pred))
 print("Confusion matrix: \n", confusion_matrix(y_test, y_test_pred))
-print("Classification report: \n", classification_report(y_test, y_test_pred))
+print("Classification report: \n", classification_report(y_test, y_test_pred)) 
 
 # %%
 # KNN model 
@@ -196,6 +198,23 @@ from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors = 10)
 knn.fit(X_train, y_train)
 y_pred = knn.predict(x_popularity)                                                                                                 
-print("Accuracy: {:.5f}%".format(knn.score(x_popularity, y_popularity)*100))
+print("Accuracy: {:.5f}%".format(knn.score(x_popularity, y_popularity)*100)) 
+
+# %%
+# SVM
+#from sklearn.svm import SVC
+#from sklearn.pipeline import make_pipeline
+#from sklearn.preprocessing import StandardScaler
+#svmodel = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+#svmodel.fit(X_train, y_train)
+#print(svmodel.score(X_test, y_test))
+
+# %%
+# MLP classifier model
+from sklearn.neural_network import MLPClassifier
+mlpmodel = MLPClassifier()
+mlpmodel.fit(X_train, y_train)
+model_pred = mlpmodel.predict(x_popularity)
+print("Accuracy: {:.5f}%".format(mlpmodel.score(x_popularity, y_popularity)*100))
 
 # %%
