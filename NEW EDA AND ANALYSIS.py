@@ -19,6 +19,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
+import warnings 
+warnings.filterwarnings('ignore')
 
 #%%
 # Reading data
@@ -37,6 +39,14 @@ df["popularity"]= [1 if i >= 50 else 0 for i in df.song_popularity ]
 #df["popularity"]= [2 if i >= 70 else 1 if (i>=50) & (i<=69) else 0 for i in df.song_popularity ]
 print(df["popularity"].value_counts())
 
+#%% 
+# Checking datatypes 
+df.info() 
+
+#%%
+# Describing data
+df.describe().transpose()
+
 # %%
 # Removing irrelevant columns
 df.drop(["song_popularity"], axis = 1, inplace=True)
@@ -44,6 +54,14 @@ df.drop(["track_id"], axis = 1, inplace=True)
 df.drop(["artist_name"], axis = 1, inplace=True)
 df.drop(["track_name"], axis = 1, inplace=True)
 df.head()
+
+# %%
+# Sorting by unique values in each column
+df.nunique().sort_values()
+
+# %%
+# Checking for null values
+print(df.isnull().sum(), "\nThere are no null values in any of the columns")
 
 #%%
 # Checking and removing duplicates
@@ -55,76 +73,135 @@ df.drop_duplicates(inplace=True)
 print("Number of observations in the dataframe after dropping duplicates: ", len(df))
 
 # %%
-# Correlations
-sns.heatmap(df.corr(), vmin=-1, vmax=1, center=0) #, annot = True)
-plt.title("Correlations between columns")
-plt.figure(figsize=[25,25])
+# Pair plots for all columns
+plt.figure(figsize = (25,25))
+sns.pairplot(df)
 plt.show()
 
+
+# %%
+# Correlations
+plt.figure(figsize=(25,15))
+sns.heatmap(df.corr(), vmin=-1, vmax=1, center=0, annot = True)
+plt.savefig("heatmap.jpg")
+plt.title("Correlations between columns")
+plt.show()
+
+
 # %% 
+# Seperating data to numerical and categorical
 # Seperating Numerical data
 nf = df.drop(["key", "mode", "tsign", "popularity"], axis = 1)
-nf.head()
+print("Numerical data: \n", nf.head())
+
+# Seperating categorical data
+cf = df[["key", "mode", "tsign", 'popularity']]
+print("\nCategorical data: \n", cf.head())
 
 #%%
-# Seperating categorical features
-cf = df[["key", "mode", "tsign", 'popularity']]
-cf.head()
+# Plots with outliers
+
+# Histograms for Numerical data
+print("\nHistograms for numerical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(nf.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.histplot(nf[nf.columns[i]], color = list(np.random.randint([255,255,255])/255))
+plt.show()
+
+# Count plots for categorical data
+print("Countplots for categorical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(cf.columns)):
+    plt.subplot(2, 2, i+1)
+    sns.countplot(cf[cf.columns[i]], palette="Set2")    
+plt.show()
+
+# Boxplots for numerical data
+print("Boxplots for numerical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(nf.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.boxplot(nf.columns[i], data = nf, color = list(np.random.randint([255,255,255])/255))
+plt.show()
 
 #%%
 # Converting categorical Columns to Numeric
-nulls = pd.DataFrame(df.isnull().sum().sort_values(), columns=['null_values'])
-print(nulls)
-dupdf = df.copy()
-e = nulls[nulls['null_values']!=0].index.values
-f = [i for i in cf if i not in e]
+#nulls = pd.DataFrame(df.isnull().sum().sort_values(), columns=['null_values'])
+#print(nulls)
+#dupdf = df.copy()
+#e = nulls[nulls['null_values']!=0].index.values
+#f = [i for i in cf if i not in e]
 
 # One-Hot Binay Encoder
-oh=True
-dm=True
-for i in f:
-    if dupdf[i].nunique() == 2:
-        if oh==True: 
-            print("One-Hot Encoding on features:")
-        print(i) 
-        oh=False
-        dupdf[i]=pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i))
-    if (dupdf[i].nunique() > 2 and dupdf[i].nunique() < 17):
-        if dm==True: 
-            print("Dummy Encoding on features:")
-        print(i)
-        dm=False
-        dupdf = pd.concat([dupdf.drop([i], axis=1), pd.DataFrame(pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i)))],axis=1)     
-dupdf.head()
+#oh=True
+#dm=True
+#for i in f:
+#    if dupdf[i].nunique() == 2:
+#        if oh==True: 
+#            print("One-Hot Encoding on features:")
+#        print(i) 
+#        oh=False
+#        dupdf[i]=pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i))
+#    if (dupdf[i].nunique() > 2 and dupdf[i].nunique() < 17):
+#        if dm==True: 
+#            print("Dummy Encoding on features:")
+#        print(i)
+#        dm=False
+#        dupdf = pd.concat([dupdf.drop([i], axis=1), pd.DataFrame(pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i)))],axis=1)     
+#dupdf.head()
 
 #%%
 # Label Encoder
-from sklearn import preprocessing
-dupdf = df.copy()
-encoder = preprocessing.LabelEncoder()
-dupdf["key"] = encoder.fit_transform(dupdf["key"])
-encoder = preprocessing.LabelEncoder()
-dupdf["mode"] = encoder.fit_transform(dupdf["mode"])
-encoder = preprocessing.LabelEncoder()
-dupdf["tsign"] = encoder.fit_transform(dupdf["tsign"])
-encoder = preprocessing.LabelEncoder()
-dupdf["popularity"] = encoder.fit_transform(dupdf["popularity"])
-dupdf.head()
+#from sklearn import preprocessing
+#dupdf = df.copy()
+#encoder = preprocessing.LabelEncoder()
+#dupdf["key"] = encoder.fit_transform(dupdf["key"])
+#encoder = preprocessing.LabelEncoder()
+#dupdf["mode"] = encoder.fit_transform(dupdf["mode"])
+#encoder = preprocessing.LabelEncoder()
+#dupdf["tsign"] = encoder.fit_transform(dupdf["tsign"])
+#encoder = preprocessing.LabelEncoder()
+#dupdf["popularity"] = encoder.fit_transform(dupdf["popularity"])
+#dupdf.head()
 
 # %% Removing outliers
+
 df1 = df.copy()
 features1 = nf
-
 for i in features1:
     Q1 = df1[i].quantile(0.25)
-    Q3 = df1[i].quantile(0.75)
-    IQR = Q3 - Q1
-    df1 = df1[df1[i] <= (Q3+(1.5*IQR))]
+    Q2 = df1[i].quantile(0.75)
+    IQR = Q2 - Q1
+    df1 = df1[df1[i] <= (Q2+(1.5*IQR))]
     df1 = df1[df1[i] >= (Q1-(1.5*IQR))]
     df1 = df1.reset_index(drop=True)
 print('Before removal of outliers, The dataset had {} samples.'.format(df.shape[0]))
 print('After removal of outliers, The dataset now has {} samples.'.format(df1.shape[0]))
 df1.head()
+
+# %% 
+# After removing outliers
+
+# Seperating Numerical data
+nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
+print("Numerical data:\n", nf1.head())
+
+# Histograms for Numerical data
+print("Histograms for numerical data:")
+plt.figure(figsize=(25,25))
+for i in range(len(nf1.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.histplot(nf1[nf1.columns[i]], color = list(np.random.randint([255,255,255])/255))
+plt.show()
+
+# Boxplots for numerical data
+print("Boxplots for numerical data:")
+plt.figure(figsize=(25,25))
+for i in range(len(nf1.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.boxplot(nf1.columns[i], data = nf1, color = list(np.random.randint([255,255,255])/255))
+plt.show()
 
 # %%
 # Splitting data
