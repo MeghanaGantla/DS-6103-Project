@@ -94,9 +94,9 @@ print("Number of observations in the dataframe after dropping duplicates: ", len
 
 # %%
 # Pair plots for all columns
-plt.figure(figsize = (25,25))
-sns.pairplot(df)
-plt.show()
+#plt.figure(figsize = (25,25))
+#sns.pairplot(df)
+#plt.show()
 
 
 # %%
@@ -171,16 +171,14 @@ plt.title("Correlations between columns")
 plt.show()
 
 # Pairplot
-plt.figure(figsize=(25,15))
-sns.pairplot(df1)
-plt.show()
+#plt.figure(figsize=(25,15))
+#sns.pairplot(df1)
+#plt.show()
 
-#%%
 # Seperating Numerical data
 nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
 print("Numerical data:\n", nf1.head())
 
-#%%
 # Histograms for Numerical data
 print("Histograms for numerical data:")
 plt.figure(figsize=(25,25))
@@ -248,8 +246,7 @@ model = LinearRegression(normalize=True)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print(np.sum(abs(y_pred - y_test))/len(y_pred))
-accu = model.score(X_test, y_test)
-print("Accuracy: {:.5f}%".format(accu * 100))
+print(model.score(X_test, y_test))
 
 #%%
 # Decision tree
