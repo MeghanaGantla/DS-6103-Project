@@ -147,46 +147,6 @@ for i in range(len(nf.columns)):
     sns.boxplot(nf.columns[i], data = nf, color = list(np.random.randint([255,255,255])/255))
 plt.show()
 
-#%%
-# Converting categorical Columns to Numeric
-#nulls = pd.DataFrame(df.isnull().sum().sort_values(), columns=['null_values'])
-#print(nulls)
-#dupdf = df.copy()
-#e = nulls[nulls['null_values']!=0].index.values
-#f = [i for i in cf if i not in e]
-
-# One-Hot Binay Encoder
-#oh=True
-#dm=True
-#for i in f:
-#    if dupdf[i].nunique() == 2:
-#        if oh==True: 
-#            print("One-Hot Encoding on features:")
-#        print(i) 
-#        oh=False
-#        dupdf[i]=pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i))
-#    if (dupdf[i].nunique() > 2 and dupdf[i].nunique() < 17):
-#        if dm==True: 
-#            print("Dummy Encoding on features:")
-#        print(i)
-#        dm=False
-#        dupdf = pd.concat([dupdf.drop([i], axis=1), pd.DataFrame(pd.get_dummies(dupdf[i], drop_first=True, prefix=str(i)))],axis=1)     
-#dupdf.head()
-
-#%%
-# Label Encoder
-#from sklearn import preprocessing
-#dupdf = df.copy()
-#encoder = preprocessing.LabelEncoder()
-#dupdf["key"] = encoder.fit_transform(dupdf["key"])
-#encoder = preprocessing.LabelEncoder()
-#dupdf["mode"] = encoder.fit_transform(dupdf["mode"])
-#encoder = preprocessing.LabelEncoder()
-#dupdf["tsign"] = encoder.fit_transform(dupdf["tsign"])
-#encoder = preprocessing.LabelEncoder()
-#dupdf["popularity"] = encoder.fit_transform(dupdf["popularity"])
-#dupdf.head()
-
 # %% Removing outliers
 
 df1 = df.copy()
@@ -215,10 +175,12 @@ plt.figure(figsize=(25,15))
 sns.pairplot(df1)
 plt.show()
 
+#%%
 # Seperating Numerical data
 nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
 print("Numerical data:\n", nf1.head())
 
+#%%
 # Histograms for Numerical data
 print("Histograms for numerical data:")
 plt.figure(figsize=(25,25))
@@ -289,33 +251,22 @@ print(np.sum(abs(y_pred - y_test))/len(y_pred))
 accu = model.score(X_test, y_test)
 print("Accuracy: {:.5f}%".format(accu * 100))
 
-#%%Then bulid tree decision model
-#Error: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
-#So need change the part of dataframe
-#df['popularity'].value_counts()
-#x_popularity = df[['key', 'mode', 'tsign', 'duration', 'acousticness', 'danceability', 'energy', 'liveness', 'loudness', 'speechiness', 'tempo', 'valence']]
-#y_popularity = df['popularity']
-#df["popularity"].where(df["popularity"] < 99, 99, True)
-#df['popularity'].value_counts()
-#X_train, X_test, y_train, y_test= train_test_split(x_popularity, y_popularity, test_size=0.2, stratify=y_popularity,random_state=1)
-
 #%%
 # Decision tree
-dtree_popularity1 = DecisionTreeClassifier(random_state=1)
-dtree_popularity1.fit(X_train,y_train)
-y_test_pred = dtree_popularity1.predict(X_test)
-print("Accuracy: {:.5f}%".format(accuracy_score(y_test, y_test_pred)*100))
-#print(accuracy_score(y_test, y_test_pred))
-print("Confusion matrix: \n", confusion_matrix(y_test, y_test_pred))
-print("Classification report: \n", classification_report(y_test, y_test_pred)) 
+dtreemodel = DecisionTreeClassifier(random_state=1)
+dtreemodel.fit(X_train,y_train)
+model_pred_dtree = dtreemodel.predict(X_test)
+print("Accuracy: {:.5f}%".format(accuracy_score(y_test, model_pred_dtree)*100))
+print("Confusion matrix: \n", confusion_matrix(y_test, model_pred_dtree))
+print("Classification report: \n", classification_report(y_test, model_pred_dtree)) 
 
 # %%
 # KNN model 
 from sklearn.neighbors import KNeighborsClassifier
-knn = KNeighborsClassifier(n_neighbors = 10)
-knn.fit(X_train, y_train)
-y_pred = knn.predict(x_popularity)                                                                                                 
-print("Accuracy: {:.5f}%".format(knn.score(x_popularity, y_popularity)*100)) 
+knnmodel = KNeighborsClassifier(n_neighbors = 10)
+knnmodel.fit(X_train, y_train)
+model_pred_knn = knnmodel.predict(x_popularity)                                                                                                 
+print("Accuracy: {:.5f}%".format(knnmodel.score(x_popularity, y_popularity)*100)) 
 
 # %%
 # SVM
@@ -331,7 +282,15 @@ print("Accuracy: {:.5f}%".format(knn.score(x_popularity, y_popularity)*100))
 from sklearn.neural_network import MLPClassifier
 mlpmodel = MLPClassifier()
 mlpmodel.fit(X_train, y_train)
-model_pred = mlpmodel.predict(x_popularity)
+model_pred_mlp = mlpmodel.predict(x_popularity)
 print("Accuracy: {:.5f}%".format(mlpmodel.score(x_popularity, y_popularity)*100))
+
+# %%
+# Random forest model
+from sklearn.ensemble import RandomForestClassifier
+rfcmodel = RandomForestClassifier()
+rfcmodel.fit(X_train, y_train)
+model_pred_rfc = rfcmodel.predict(x_popularity)
+print("Accuracy: {:.5f}%".format(rfcmodel.score(x_popularity, y_popularity)*100))
 
 # %%
