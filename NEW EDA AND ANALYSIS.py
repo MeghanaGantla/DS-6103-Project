@@ -34,13 +34,6 @@ df.head()
 df.rename(columns = {'duration_ms':'duration', 'time_signature':'tsign', 'popularity':'song_popularity'}, inplace = True)
 df.head()
 
-#%%
-# Adding a new column
-print(df['song_popularity'].mean())
-df["popularity"]= [1 if i >= 50 else 0 for i in df.song_popularity ]
-#df["popularity"]= [2 if i >= 70 else 1 if (i>=50) & (i<=69) else 0 for i in df.song_popularity ]
-print(df["popularity"].value_counts())
-
 #%% 
 # Checking datatypes 
 df.info() 
@@ -49,37 +42,109 @@ df.info()
 # Describing data
 df.describe().transpose()
 
-#%%
-plt.figure(figsize=(25,25))
-sns.histplot(df["song_popularity"], color="green")
-plt.xlabel("Popularity")
-plt.savefig("Popularityhist.jpg")
-plt.show()
-#%%
-plt.figure(figsize=(25,25))
-sns.boxplot(df["song_popularity"], color = "yellow")
-plt.xlabel("Popularity")
-#plt.savefig("Popularitybox.jpg")
-plt.show()
+# %%
+# Sorting by unique values in each column
+df.nunique().sort_values()
 
-#%%
-plt.figure(figsize=(25,12))
-sns.countplot(df["popularity"], palette="Set2")
-#plt.savefig("Popularitycount.jpg")
-plt.show()
 # %%
 # Removing irrelevant columns
-df.drop(["song_popularity"], axis = 1, inplace=True)
 df.drop(["track_id"], axis = 1, inplace=True)
 df.drop(["artist_name"], axis = 1, inplace=True)
 df.drop(["track_name"], axis = 1, inplace=True)
 df.head()
 
 # %%
-# Sorting by unique values in each column
-df.nunique().sort_values()
+# Correlations (before preprocessing)
+plt.figure(figsize=(25,15))
+sns.heatmap(df.corr(), vmin=-1, vmax=1, center=0, annot = True)
+#plt.savefig("heatmap.jpg")
+plt.title("Correlations between columns")
+plt.show()
 
-# %%
+#%% 
+# understanding popularity distribution
+
+# Histogram
+plt.figure(figsize=(25,25))
+sns.histplot(df["song_popularity"], color="green")
+plt.xlabel("Popularity")
+plt.title("Histogram for popularity")
+#plt.savefig("Popularityhist.jpg")
+plt.show()
+
+# Boxplot
+plt.figure(figsize=(25,25))
+sns.boxplot(df["song_popularity"], color = "yellow")
+plt.xlabel("Popularity")
+plt.title("Boxplot for popularity")
+#plt.savefig("Popularitybox.jpg")
+plt.show()
+
+#%%
+# Dividing popularity into "Below average - 0" and "Above average - 1" 
+print(df['song_popularity'].mean())
+df["popularity"]= [1 if i >= 24 else 0 for i in df.song_popularity ]
+print(df["popularity"].value_counts())
+df.drop(["song_popularity"], axis = 1, inplace=True)
+
+# Count plot for popularity
+plt.figure(figsize=(25,12))
+sns.countplot(df["popularity"], palette="Set2")
+plt.title("Count plot for popularity")
+#plt.savefig("Popularitycount.jpg")
+plt.show()
+
+# %% 
+# Seperating data to numerical and categorical
+# Seperating Numerical data
+nf = df.drop(["key", "mode", "tsign", "popularity"], axis = 1)
+print("Numerical data: \n", nf.head())
+
+# Seperating categorical data
+cf = df[["key", "mode", "tsign", 'popularity']]
+print("\nCategorical data: \n", cf.head())
+
+#%% Describing all numerical data
+nf.describe().transpose()
+
+#%% [markdown]
+# # Plots before preprocessing
+
+#%%
+
+# Histograms for Numerical data
+print("\nHistograms for numerical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(nf.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.histplot(nf[nf.columns[i]], color = list(np.random.randint([255,255,255])/255))
+plt.show()
+
+# Boxplots for numerical data
+print("Boxplots for numerical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(nf.columns)):
+    plt.subplot(5, 2, i+1)
+    sns.boxplot(nf.columns[i], data = nf, color = list(np.random.randint([255,255,255])/255))
+plt.show()
+
+# Count plots for categorical data
+print("Countplots for categorical data:")
+plt.figure(figsize=(25,20))
+for i in range(len(cf.columns)):
+    plt.subplot(2, 2, i+1)
+    sns.countplot(cf[cf.columns[i]], palette="Set2")    
+plt.show()
+
+# Pair plots for all columns
+plt.figure(figsize = (25,25))
+sns.pairplot(df)
+plt.show()
+
+#%% [markdown]
+# # Preprocessing
+
+#%%
 # Checking for null values
 print(df.isnull().sum(), "\nThere are no null values in any of the columns")
 
@@ -92,65 +157,10 @@ print("Number of duplicates: ", str(duplicates))
 df.drop_duplicates(inplace=True)
 print("Number of observations in the dataframe after dropping duplicates: ", len(df))
 
-# %%
-# Pair plots for all columns
-#plt.figure(figsize = (25,25))
-#sns.pairplot(df)
-#plt.show()
-
-
-# %%
-# Correlations
-plt.figure(figsize=(25,15))
-sns.heatmap(df.corr(), vmin=-1, vmax=1, center=0, annot = True)
-plt.savefig("heatmap.jpg")
-plt.title("Correlations between columns")
-plt.show()
-
-
 # %% 
-# Seperating data to numerical and categorical
-# Seperating Numerical data
-nf = df.drop(["key", "mode", "tsign", "popularity"], axis = 1)
-print("Numerical data: \n", nf.head())
-
-# Seperating categorical data
-cf = df[["key", "mode", "tsign", 'popularity']]
-print("\nCategorical data: \n", cf.head())
-
-nf.describe().transpose()
-
-#%%
-# Plots with outliers
-
-# Histograms for Numerical data
-print("\nHistograms for numerical data:")
-plt.figure(figsize=(25,20))
-for i in range(len(nf.columns)):
-    plt.subplot(5, 2, i+1)
-    sns.histplot(nf[nf.columns[i]], color = list(np.random.randint([255,255,255])/255))
-plt.show()
-
-# Count plots for categorical data
-print("Countplots for categorical data:")
-plt.figure(figsize=(25,20))
-for i in range(len(cf.columns)):
-    plt.subplot(2, 2, i+1)
-    sns.countplot(cf[cf.columns[i]], palette="Set2")    
-plt.show()
-
-# Boxplots for numerical data
-print("Boxplots for numerical data:")
-plt.figure(figsize=(25,20))
-for i in range(len(nf.columns)):
-    plt.subplot(5, 2, i+1)
-    sns.boxplot(nf.columns[i], data = nf, color = list(np.random.randint([255,255,255])/255))
-plt.show()
-
-# %% Removing outliers
-
+# Removing outliers
 df1 = df.copy()
-features1 = nf
+features1 = nf[["acousticness", "danceability", "duration", "energy", "liveness", "loudness", "speechiness", "tempo", "valence" ]]
 for i in features1:
     Q1 = df1[i].quantile(0.25)
     Q2 = df1[i].quantile(0.75)
@@ -162,22 +172,26 @@ print('Before removal of outliers, The dataset had {} samples.'.format(df.shape[
 print('After removal of outliers, The dataset now has {} samples.'.format(df1.shape[0]))
 df1.head()
 
-# %% 
-# After removing outliers
+# Seperating Numerical data
+nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
+print("Numerical data:\n", nf1.head())
+
+# %% [markdown]
+# Plots after preprocessing
+
+#%%
 # heatmap
+print("Correlations:")
 plt.figure(figsize=(25,15))
 sns.heatmap(df1.corr(), vmin=-1, vmax=1, center=0, annot = True)
 plt.title("Correlations between columns")
 plt.show()
 
 # Pairplot
-#plt.figure(figsize=(25,15))
-#sns.pairplot(df1)
-#plt.show()
-
-# Seperating Numerical data
-nf1 = df1.drop(["key", "mode", "tsign", "popularity"], axis = 1)
-print("Numerical data:\n", nf1.head())
+print("Pairplots:")
+plt.figure(figsize=(25,15))
+sns.pairplot(df1)
+plt.show()
 
 # Histograms for Numerical data
 print("Histograms for numerical data:")
