@@ -8,20 +8,21 @@ from sklearn import datasets
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
-#%%
+# %%
 # Reading data
 df = pd.read_csv("SpotifyAudioFeaturesNov2018.csv")
 df.head()
 
 # %%
 # # Changing column names
-df.rename(columns = {'duration_ms':'duration', 'time_signature':'tsign', 'popularity':'song_popularity'}, inplace = True)
+df.rename(columns={'duration_ms': 'duration', 'time_signature': 'tsign',
+          'popularity': 'song_popularity'}, inplace=True)
 df.head()
 
-#%%
+# %%
 # Adding a new column
 print(df['song_popularity'].mean())
-df["popularity"]= [1 if i >= 50 else 0 for i in df.song_popularity ]
+df["popularity"] = [1 if i >= 50 else 0 for i in df.song_popularity]
 #df["popularity"]= [2 if i >= 70 else 1 if (i>=50) & (i<=69) else 0 for i in df.song_popularity ]
 print(df["popularity"].value_counts())
 
@@ -41,3 +42,11 @@ dtree_predictions = dtree_model.predict(X_test)
 
 # creating a confusion matrix
 cm = confusion_matrix(y_test, dtree_predictions)
+
+
+dtreemodel = DecisionTreeClassifier(random_state=1)
+dtreemodel.fit(X_train, y_train)
+model_pred_dtree = dtreemodel.predict(X_test)
+print("Accuracy: {:.5f}%".format(accuracy_score(y_test, model_pred_dtree)*100))
+print("Confusion matrix: \n", confusion_matrix(y_test, model_pred_dtree))
+print("Classification report: \n", classification_report(y_test, model_pred_dtree))
