@@ -261,6 +261,12 @@ print(model.score(X_test, y_test))
 
 # %%
 # Decision tree
+dtreemodel = DecisionTreeClassifier(random_state=1)
+dtreemodel.fit(X_train, y_train)
+model_pred_dtree = dtreemodel.predict(X_test)
+print("Accuracy: {:.5f}%".format(accuracy_score(y_test, model_pred_dtree)*100))
+print("Confusion matrix: \n", confusion_matrix(y_test, model_pred_dtree))
+print("Classification report: \n", classification_report(y_test, model_pred_dtree))
 
 
 # %%
