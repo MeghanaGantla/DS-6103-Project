@@ -285,7 +285,7 @@ print("Classification report: \n", classification_report(y_test, model_pred_dtre
 
 # %%
 # KNN model
-knnmodel = KNeighborsClassifier(n_neighbors=10)
+knnmodel = KNeighborsClassifier(n_neighbors=3)
 knnmodel.fit(X_train, y_train)
 model_pred_knn = knnmodel.predict(x_popularity)
 print("Accuracy: {:.5f}%".format(
