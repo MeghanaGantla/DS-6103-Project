@@ -232,7 +232,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = LinearRegression()
 model.fit(X_train, y_train)
 model_acc = model.score(X_test, y_test)
-print("Test Accuracy {:.5f}%".format(model_acc * 100))
+print("Test score:", model_acc)
 
 # %%
 # Logit model 1
